@@ -1,0 +1,34 @@
+eureka:
+  client:
+    enabled: false
+
+server:
+  port: 8081
+
+spring:
+  application:
+    name: authenticationService
+  rabbitmq:
+    addresses: rabbitmq:5672
+  datasource:
+    password: test
+    url: jdbc:postgresql://postgres:5432/authDB
+    username: bitblizz
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+
+
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans

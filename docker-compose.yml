@@ -1,0 +1,117 @@
+version: '3.9'
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: bitblizz
+      POSTGRES_PASSWORD: test
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+
+  discovery-server:
+    image: assesmentdocker/discovery
+    container_name: DiscoveryServer
+    hostname: discovery-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "8761:8761"
+    build:
+      context: ./DiscoveryServer
+      dockerfile: "Dockerfile"
+    networks:
+      - spring
+
+  gateway:
+    image: assesmentdocker/api-gateway
+    container_name: ApiGateway
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "8080:8080"
+    build:
+      context: ./ApiGateway
+      dockerfile: "Dockerfile"
+    networks:
+      - spring
+    depends_on:
+      - discovery-server
+  authentication-service:
+    image: assesmentdocker/authentication-service
+    container_name: AuthenticationService
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "8082:8082"
+    build:
+      context: ./AuthenticationService
+      dockerfile: "Dockerfile"
+    networks:
+      - spring
+      - postgres
+    depends_on:
+      - discovery-server
+      - postgres
+      - rabbitmq
+  user-service:
+    image: assesmentdocker/user-service
+    container_name: UserService
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "8081:8081"
+    build:
+      context: ./UserService
+      dockerfile: "Dockerfile"
+    networks:
+      - spring
+      - postgres
+    depends_on:
+      - discovery-server
+      - postgres
+      - rabbitmq
+
+  blockchain-service:
+    image: assesmentdocker/blockchain-service
+    container_name: BlockchainService
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "8083:8083"
+    build:
+      context: ./BlockchainService
+      dockerfile: "Dockerfile"
+    networks:
+      - spring
+      - postgres
+    depends_on:
+      - discovery-server
+      - postgres
+      - rabbitmq
+  rabbitmq:
+    image: rabbitmq:3.9.11-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - spring
+      - rabbitmqNetwork
+
+networks:
+    postgres:
+      driver: bridge
+    spring:
+      driver: bridge
+    rabbitmqNetwork:
+      driver: bridge
+
+volumes:
+  postgres:

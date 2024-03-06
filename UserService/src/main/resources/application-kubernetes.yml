@@ -1,0 +1,27 @@
+eureka:
+  client:
+    enabled: false
+
+server:
+  port: 8081
+
+spring:
+  application:
+    name: UserService
+  rabbitmq:
+    addresses: rabbitmq:5672
+  datasource:
+    password: test
+    url: jdbc:postgresql://postgres:5432/usersDB
+    username: bitblizz
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+
+
+

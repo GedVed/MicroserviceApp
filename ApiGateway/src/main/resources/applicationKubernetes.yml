@@ -1,0 +1,22 @@
+eureka:
+  client:
+    enabled: false
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**
+
+        - id: UserService
+          uri: lb://UserService
+          predicates:
+            - Path=/user/**
+          filters:
+            - AuthenticationFilter
+
+  application:
+    name: ApiGateway
